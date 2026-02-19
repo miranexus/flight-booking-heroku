@@ -1,0 +1,14 @@
+{
+  "name": "flight-booking-heroku",
+  "version": "1.0.0",
+  "engines": {
+    "node": "22.16.0"
+  },
+  "scripts": {
+    "start": "node flight-booking-master/api/server.js",
+    "heroku-postbuild": "cd flight-booking-master && npm install && npm run build"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
