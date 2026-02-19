@@ -1,14 +1,14 @@
 #!/bin/bash
 set -e
-(
-  cd flight-booking-master
-  echo "Installing dependencies with dev packages..."
-  npm install --legacy-peer-deps --save-dev
-  npm install --legacy-peer-deps
-  echo "Listing ng binary location..."
-  ls -la node_modules/.bin/ | grep ng
-  echo "Running build..."
-  ./node_modules/.bin/ng build --configuration production
-  echo "Build complete!"
-)
+cd flight-booking-master
+echo "Cleaning npm cache..."
+npm cache clean --force
+echo "Removing node_modules..."
+rm -rf node_modules
+echo "Installing dependencies..."
+npm install --legacy-peer-deps --no-cache
+echo "Running Angular build..."
+npm exec ng -- build --configuration production
+echo "Build complete!"
+
 
