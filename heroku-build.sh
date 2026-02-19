@@ -1,8 +1,9 @@
 #!/bin/bash
 set -e
-echo "Building flight-booking application..."
 cd flight-booking-master
+echo "Installing dependencies..."
 npm install --legacy-peer-deps --production=false
-npm run build
+echo "Running ng build..."
+npx ng build --configuration production
 echo "Build complete!"
 
