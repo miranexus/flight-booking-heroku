@@ -1,18 +1,13 @@
 #!/bin/bash
 set -e
 cd flight-booking-master
-echo "Installing ALL dependencies (dev + prod)..."
-npm install --legacy-peer-deps
-echo "Checking if ng exists..."
-if [ -f "./node_modules/.bin/ng" ]; then
-  echo "ng found!"
-else
-  echo "ng NOT found, listing node_modules/.bin:"
-  ls -la ./node_modules/.bin/ 2>&1 | head -20
-fi
-echo "Running build via npm script..."
+echo "Ensuring node_modules directory exists and installing dependencies..."
+rm -rf node_modules package-lock.json
+npm install
+echo "Building application..."
 npm run build
-echo "Build complete!"
+echo "Build complete and successful!"
+
 
 
 
