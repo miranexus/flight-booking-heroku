@@ -1,9 +1,10 @@
 #!/bin/bash
 set -e
 cd flight-booking-master
-echo "Installing dependencies..."
-npm install --legacy-peer-deps --production=false
-echo "Running ng build..."
-npx ng build --configuration production
+echo "Installing dependencies with dev packages..."
+npm install --legacy-peer-deps
+npm ci --only=dev --legacy-peer-deps
+echo "Running build..."
+npm run build
 echo "Build complete!"
 
