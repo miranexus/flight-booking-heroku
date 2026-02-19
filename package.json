@@ -7,8 +7,7 @@
   },
   "scripts": {
     "start": "node flight-booking-master/api/server.js",
-    "postinstall": "cd flight-booking-master && npm install --legacy-peer-deps",
-    "heroku-postbuild": "cd flight-booking-master && npm run build"
+    "heroku-postbuild": "cd flight-booking-master && npm install --legacy-peer-deps --production=false && npm run build"
   },
   "dependencies": {
     "express": "^4.18.2"
