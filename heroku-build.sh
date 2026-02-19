@@ -1,16 +1,15 @@
 #!/bin/bash
 set -e
-echo "Initializing git submodules..."
-git submodule update --init --recursive || true
-echo "Submodule status:"
-ls -la flight-booking-master/
 cd flight-booking-master
-echo "Current directory: $(pwd)"
-echo "Installing dependencies..."
-npm install
-echo "Running build..."
+echo "Current working directory: $(pwd)"
+echo "Listing directory contents:"
+ls -la | head -20
+echo "Installing dependencies with npm..."
+npm install --force
+echo "Running Angular build..."
 npm run build
-echo "Build complete!"
+echo "Build successful!"
+
 
 
 
