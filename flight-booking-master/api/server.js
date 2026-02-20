@@ -19,9 +19,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static Angular files in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../dist/flight-booking')));
+  const staticPath = path.join(__dirname, '../dist/flight-booking');
+  console.log(`Serving static files from: ${staticPath}`);
+  app.use(express.static(staticPath));
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../dist/flight-booking/browser/index.html'));
+    // Serve the standard Angular build index.html (not the `browser` subfolder)
+    res.sendFile(path.join(staticPath, 'index.html'));
   });
 }
 
