@@ -20,22 +20,39 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static Angular files in production
 if (process.env.NODE_ENV === 'production') {
   const fs = require('fs');
-  let staticPath = path.join(__dirname, '../dist/flight-booking');
-  let indexPath = path.join(staticPath, 'index.html');
+  const candidates = [
+    path.join(__dirname, '../dist/flight-booking/index.html'),
+    path.join(__dirname, '../dist/flight-booking/browser/index.html'),
+    path.join(__dirname, '../dist/index.html'),
+    path.join(process.cwd(), 'dist/flight-booking/index.html'),
+    path.join(process.cwd(), 'dist/flight-booking/browser/index.html'),
+    path.join(process.cwd(), 'dist/index.html'),
+    path.join(process.cwd(), 'flight-booking-master/dist/flight-booking/index.html'),
+    path.join(process.cwd(), 'flight-booking-master/dist/index.html')
+  ];
 
-  // If the build put files under a `browser` subfolder (common with some builds), use that
-  if (!fs.existsSync(indexPath)) {
-    const altIndex = path.join(staticPath, 'browser', 'index.html');
-    if (fs.existsSync(altIndex)) {
-      staticPath = path.join(staticPath, 'browser');
-      indexPath = altIndex;
+  let foundIndex = null;
+  let staticPath = null;
+
+  for (const p of candidates) {
+    if (fs.existsSync(p)) {
+      foundIndex = p;
+      staticPath = path.dirname(p);
+      break;
     }
   }
 
+  if (!foundIndex) {
+    console.warn('No Angular index.html found in expected locations. Will still attempt to serve from ../dist/flight-booking');
+    staticPath = path.join(__dirname, '../dist/flight-booking');
+    foundIndex = path.join(staticPath, 'index.html');
+  }
+
   console.log(`Serving static files from: ${staticPath}`);
+  console.log(`Index file: ${foundIndex}`);
   app.use(express.static(staticPath));
   app.get('*', (req, res) => {
-    res.sendFile(indexPath);
+    res.sendFile(foundIndex);
   });
 }
 
