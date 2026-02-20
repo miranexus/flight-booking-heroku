@@ -34,11 +34,17 @@ if (process.env.NODE_ENV === 'production') {
   let foundIndex = null;
   let staticPath = null;
 
+  console.log('Checking candidate index.html locations:');
   for (const p of candidates) {
-    if (fs.existsSync(p)) {
-      foundIndex = p;
-      staticPath = path.dirname(p);
-      break;
+    try {
+      const exists = fs.existsSync(p);
+      console.log(`${p} -> ${exists}`);
+      if (exists && !foundIndex) {
+        foundIndex = p;
+        staticPath = path.dirname(p);
+      }
+    } catch (e) {
+      console.log(`Error checking ${p}: ${e.message}`);
     }
   }
 
@@ -48,11 +54,16 @@ if (process.env.NODE_ENV === 'production') {
     foundIndex = path.join(staticPath, 'index.html');
   }
 
-  console.log(`Serving static files from: ${staticPath}`);
-  console.log(`Index file: ${foundIndex}`);
+  console.log(`Selected staticPath: ${staticPath}`);
+  console.log(`Selected index file: ${foundIndex}`);
   app.use(express.static(staticPath));
   app.get('*', (req, res) => {
-    res.sendFile(foundIndex);
+    res.sendFile(foundIndex, (err) => {
+      if (err) {
+        console.error('Error serving index file:', err && err.message ? err.message : err);
+        res.status(404).send('Not found');
+      }
+    });
   });
 }
 
