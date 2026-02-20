@@ -4,9 +4,22 @@ const path = require("path");
 
 const app = express();
 
+// CORS configuration with support for development
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' ? '*' : "http://localhost:4200",
-  credentials: true
+  origin: function (origin, callback) {
+    const isDev = process.env.NODE_ENV !== 'production';
+
+    if (isDev) {
+      // In development, allow localhost origins
+      callback(null, true);
+    } else {
+      // In production, allow all origins
+      callback(null, true);
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 app.use(cors(corsOptions));
