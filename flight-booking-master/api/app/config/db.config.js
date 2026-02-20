@@ -9,5 +9,10 @@ module.exports = {
     min: 0,
     acquire: 30000,
     idle: 10000
-  }
+  },
+  // Connection retry and timeout settings
+  connect_timeout: 10000,
+  connectionLimit: 5,
+  waitForConnections: true,
+  queueLimit: 0
 };

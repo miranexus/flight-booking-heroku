@@ -5,7 +5,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
   operatorsAliases: false,
-
+  logging: (msg) => console.log("[DB LOG]:", msg),
   pool: {
     max: dbConfig.pool.max,
     min: dbConfig.pool.min,
@@ -20,10 +20,13 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 db.primeNgData = require("./prime-ng-data.model.js")(sequelize, Sequelize);
 
-// Seed data function
+// Seed data function with enhanced error handling
 db.seedData = async () => {
   try {
+    console.log("[SEED] Starting database seed operation...");
+
     const count = await db.primeNgData.count();
+    console.log(`[SEED] Current record count: ${count}`);
 
     // Only seed if table is empty
     if (count === 0) {
@@ -55,13 +58,18 @@ db.seedData = async () => {
         }
       ];
 
-      await db.primeNgData.bulkCreate(sampleData);
-      console.log("Database seeded with sample data successfully.");
+      console.log("[SEED] Inserting sample data...");
+      const result = await db.primeNgData.bulkCreate(sampleData);
+      console.log(`[SEED] Successfully seeded ${result.length} records into database.`);
+      return { success: true, message: `Seeded ${result.length} records`, recordsAdded: result.length };
     } else {
-      console.log(`Database already contains ${count} records, skipping seed.`);
+      console.log(`[SEED] Database already contains ${count} records, skipping seed.`);
+      return { success: true, message: `Database already has ${count} records`, recordsAdded: 0 };
     }
   } catch (err) {
-    console.error("Error seeding database:", err.message);
+    console.error("[SEED] Error seeding database:", err.message);
+    console.error("[SEED] Full error:", err);
+    return { success: false, message: `Error seeding database: ${err.message}`, error: err.message };
   }
 };
 

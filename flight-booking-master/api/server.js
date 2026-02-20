@@ -153,24 +153,49 @@ if (process.env.NODE_ENV === 'production') {
 
 const db = require("./app/models")
 
+console.log("[STARTUP] Database configuration:");
+console.log(`  HOST: ${process.env.DB_HOST || "50.6.161.1"}`);
+console.log(`  DATABASE: ${process.env.DB_NAME || "sktmfgte_miranexus"}`);
+console.log(`  USER: ${process.env.DB_USER || "sktmfgte_miranexus"}`);
+
 db.sequelize.sync()
   .then(() => {
-    console.log("Synced db.");
+    console.log("[DB] Synced db.");
     // Seed data if table is empty
     return db.seedData();
   })
-  .then(() => {
-    console.log("Database initialization complete.");
+  .then((result) => {
+    console.log("[DB] Database initialization complete:", result.message);
   })
   .catch((err) => {
-    console.log("Failed to sync db: " + err.message);
-    console.log("Note: Database connection may be restricted. Check database host permissions.");
+    console.error("[DB ERROR] Failed to sync db: " + err.message);
+    console.error("[DB ERROR] Stack trace:", err.stack);
+    console.error("[DB ERROR] Note: Database connection may be restricted from Heroku.");
+    console.error("[DB ERROR] You can manually seed data via POST /api/seed endpoint once connection is fixed.");
   });
 
-// // drop the table if it already exists
-// db.sequelize.sync({ force: true }).then(() => {
-//   console.log("Drop and re-sync db.");
-// });
+// Manual seed endpoint - allows triggering seed after connection is restored
+app.post("/api/seed", async (req, res) => {
+  try {
+    const result = await db.seedData();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+  db.sequelize.authenticate()
+    .then(() => {
+      res.json({ status: "ok", database: "connected" });
+    })
+    .catch((err) => {
+      res.status(503).json({ status: "error", database: "disconnected", message: err.message });
+    });
+});
+
+// ...existing code...
 
 // simple route
 app.get("/", (req, res) => {
