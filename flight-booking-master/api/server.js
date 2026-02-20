@@ -19,12 +19,23 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static Angular files in production
 if (process.env.NODE_ENV === 'production') {
-  const staticPath = path.join(__dirname, '../dist/flight-booking');
+  const fs = require('fs');
+  let staticPath = path.join(__dirname, '../dist/flight-booking');
+  let indexPath = path.join(staticPath, 'index.html');
+
+  // If the build put files under a `browser` subfolder (common with some builds), use that
+  if (!fs.existsSync(indexPath)) {
+    const altIndex = path.join(staticPath, 'browser', 'index.html');
+    if (fs.existsSync(altIndex)) {
+      staticPath = path.join(staticPath, 'browser');
+      indexPath = altIndex;
+    }
+  }
+
   console.log(`Serving static files from: ${staticPath}`);
   app.use(express.static(staticPath));
   app.get('*', (req, res) => {
-    // Serve the standard Angular build index.html (not the `browser` subfolder)
-    res.sendFile(path.join(staticPath, 'index.html'));
+    res.sendFile(indexPath);
   });
 }
 
