@@ -6,7 +6,8 @@
     "npm": "10.9.2"
   },
   "scripts": {
-    "start": "node flight-booking-master/api/server.js"
+    "start": "node flight-booking-master/api/server.js",
+    "heroku-postbuild": "cd flight-booking-master && npm ci --no-audit --no-fund && npm run build && cp -r dist/flight-booking/browser/* dist/flight-booking/ || true"
   },
   "dependencies": {
     "express": "^4.18.2"

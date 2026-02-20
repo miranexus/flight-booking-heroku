@@ -156,9 +156,15 @@ const db = require("./app/models")
 db.sequelize.sync()
   .then(() => {
     console.log("Synced db.");
+    // Seed data if table is empty
+    return db.seedData();
+  })
+  .then(() => {
+    console.log("Database initialization complete.");
   })
   .catch((err) => {
     console.log("Failed to sync db: " + err.message);
+    console.log("Note: Database connection may be restricted. Check database host permissions.");
   });
 
 // // drop the table if it already exists
